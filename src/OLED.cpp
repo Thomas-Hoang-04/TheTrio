@@ -1,48 +1,42 @@
-#include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
-
-#define WIDTH 128
-#define HEIGHT 64
-#define OLED_RESET -1
-#define SDA 35
-#define SCL 34
-
-extern int baud_list[];
+#include <OLED.h>
 
 Adafruit_SSD1306 display(WIDTH, HEIGHT, &Wire, OLED_RESET);
 
 void setup_OLED() {
-Wire.begin(SDA, SCL);
+  Wire.begin(SDA, SCL);
   if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
     Serial.println(F("SSD1306 allocation failed"));
   }
+  display.setTextWrap(true);
+  display.clearDisplay();
   display.setTextSize(1);
   display.setTextColor(SSD1306_WHITE);
 
   display.display();
 }
 
-void menu_UART(int selected, char* uart_channel) {
+void menu_UART(int baud_rate, String uart_channel) {
+    display.clearDisplay();
     display.setCursor(0, 0);
     display.print("Select baud rate for ");
     display.print(uart_channel);
     display.setCursor(20, 40);
     display.print("<");
-    display.setCursor(25, 40);
-    display.print(baud_list[selected]);
     display.setCursor(40, 40);
+    display.print(baud_rate);
+    display.setCursor(100, 40);
     display.print(">");
     display.display();
 }
 
-void menu_msg(char* msg_A, char* msg_B) {
+void menu_msg(String msg_A, String msg_B) {
+    display.clearDisplay();
     display.setCursor(0, 0);
     display.println("UART Monitoring");
     display.setCursor(0, 10);
     display.print("UART_A: ");
     display.println(msg_A);
-    display.setCursor(0, 20);
+    display.setCursor(0, 35);
     display.print("UART_B: ");
     display.println(msg_B);
     display.display();

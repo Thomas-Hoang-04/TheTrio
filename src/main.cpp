@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <HardwareSerial.h>
 #include <OLED.h>
+#include "EEPROM_Storage.h"
 
 // Tạo 2 UART riêng
 HardwareSerial Seria1(1);
@@ -18,8 +19,7 @@ const int baud_count = sizeof(baud_list) / sizeof(baud_list[0]);
 int baudIndex1 = 0;
 int baudIndex2 = 0;
 bool isBaud1 = true;
- char * msg_A, *msg_B;
-
+String msg_A, msg_B;
 
 volatile unsigned long lastInterruptTime = 0;
 volatile bool inInterruptMode = false;
@@ -29,7 +29,7 @@ hw_timer_t * timer = NULL;
 // Button interrupt handler
 void IRAM_ATTR handleButtonInterrupt() {
   unsigned long currentTime = millis();
-  int* baudIndex = (isBaud1) ? &baudIndex1 : &baudIndex2 ;  
+  int* baudIndex = (isBaud1) ? &baudIndex1 : &baudIndex2 ;
 
   if (!inInterruptMode) {
     inInterruptMode = true;
@@ -47,10 +47,19 @@ void IRAM_ATTR handleButtonInterrupt() {
     Serial.print(isBaud1 ? "1: " : "2: ");
     Serial.println(baud_list[*baudIndex]);
 
+    // Save current baud rate settings and switch to the other UART
     if (isBaud1) {
-      baudIndex1 = *baudIndex;
+      if (baudIndex1 != *baudIndex) {
+        baudIndex1 = *baudIndex;
+        // Save to EEPROM when baud rate changes
+  
+
+      }
     } else {
-      baudIndex2 = *baudIndex;
+      if (baudIndex2 != *baudIndex) {
+        baudIndex2 = *baudIndex;
+        // Save to EEPROM when baud rate changes
+      }
     }
 
     isBaud1 = !isBaud1;
@@ -63,7 +72,7 @@ void IRAM_ATTR handleButtonInterrupt() {
 // Timer interrupt handler
 void IRAM_ATTR onTimer() {
   unsigned long currentTime = millis();
-  if (currentTime - lastInterruptTime >= 1000) {
+  if (currentTime - lastInterruptTime >= 3000) {
     inInterruptMode = false;
     timerAlarmDisable(timer);
   }
@@ -73,10 +82,19 @@ void setup() {
   Serial.begin(115200);
   while (!Serial);
 
-  Seria1.begin(9600, SERIAL_8N1, 16, 17);
-  Seria2.begin(9600, SERIAL_8N1, 5, 4);
+  // Initialize EEPROM and load saved baud rates
+  setupEEPROM();
+  loadBaudRates(&baudIndex1, &baudIndex2);
+
+  // Initialize UART with loaded baud rates
+  Seria1.begin(baud_list[baudIndex1], SERIAL_8N1, 16, 17);
+  Seria2.begin(baud_list[baudIndex2], SERIAL_8N1, 5, 4);
 
   Serial.println("ESP32 UART Bridge ready!");
+  Serial.print("UART1 baud rate: ");
+  Serial.println(baud_list[baudIndex1]);
+  Serial.print("UART2 baud rate: ");
+  Serial.println(baud_list[baudIndex2]);
 
   pinMode(SLCT_BUTTON, INPUT);
   pinMode(INC_BUTTON, INPUT);
@@ -90,19 +108,23 @@ void setup() {
   timerAttachInterrupt(timer, &onTimer, true);
   timerAlarmWrite(timer, 10000, true);
   timerAlarmEnable(timer);
+  setup_OLED();
 }
 
 void loop() {
-  menu_msg(msg_A,msg_B);
+  if (!inInterruptMode) {
+    menu_msg(msg_A,msg_B);
+    Seria1.begin(baud_list[baudIndex1], SERIAL_8N1, 16, 17);
+    Seria2.begin(baud_list[baudIndex2], SERIAL_8N1, 5, 4);
+    saveBaudRates(baudIndex1, baudIndex2);
+  }
 
   if (Seria1.available()) {
     String received = Seria1.readStringUntil('\n');
     Serial.print("Từ UART1: ");
     Serial.println(received);
     Seria2.println(received);
-    msg_A 
-    
-
+    msg_A = received;
   }
 
   if (Seria2.available()) {
@@ -110,20 +132,20 @@ void loop() {
     Serial.print("Từ UART2: ");
     Serial.println(received);
     Seria1.println(received);
-
+    msg_B = received;
   }
 
   if (inInterruptMode) {
     Serial.print("Đang chọn baudrate cho UART");
     if(isBaud1){
-      Serial.print( "1: "); 
+      menu_UART(baud_list[baudIndex1], "UART_A");
+      Serial.print( "1: ");
       Serial.println(baud_list[baudIndex1]);
     }else{
-      Serial.print( "2: "); 
+      menu_UART(baud_list[baudIndex2], "UART_B");
+      Serial.print( "2: ");
       Serial.println(baud_list[baudIndex2]);
     }
-
-
 
     delay(500);
   }
