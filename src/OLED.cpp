@@ -18,8 +18,9 @@ void setup_OLED() {
 void menu_UART(int baud_rate, String uart_channel) {
     display.clearDisplay();
     display.setCursor(0, 0);
-    display.print("Select baud rate for ");
-    display.print(uart_channel);
+    display.println("Select baud rate for ");
+    display.setCursor(40, 18);
+    display.println(uart_channel);
     display.setCursor(20, 40);
     display.print("<");
     display.setCursor(40, 40);
@@ -29,14 +30,21 @@ void menu_UART(int baud_rate, String uart_channel) {
     display.display();
 }
 
-void menu_msg(String msg_A, String msg_B) {
+void menu_UART_A(String msg_A) {
     display.clearDisplay();
     display.setCursor(0, 0);
     display.println("UART Monitoring");
-    display.setCursor(0, 10);
+    display.println("Press SW for UART_B");
     display.print("UART_A: ");
     display.println(msg_A);
-    display.setCursor(0, 35);
+    display.display();
+}
+
+void menu_UART_B(String msg_B) {
+    display.clearDisplay();
+    display.setCursor(0, 0);
+    display.println("UART Monitoring");
+    display.println("Press SW for UART_A");
     display.print("UART_B: ");
     display.println(msg_B);
     display.display();
