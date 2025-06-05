@@ -41,4 +41,3 @@ void menu_msg(String msg_A, String msg_B) {
     display.println(msg_B);
     display.display();
 }
-

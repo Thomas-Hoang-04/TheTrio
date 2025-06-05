@@ -9,8 +9,8 @@
 #define WIDTH 128
 #define HEIGHT 64
 #define OLED_RESET -1
-#define SDA 21
-#define SCL 22
+#define SDA 13
+#define SCL 14
 
 extern Adafruit_SSD1306 display;
 
