@@ -51,8 +51,15 @@ _**Linh kiện sử dụng**_
 - Màn hình OLED hiển thị các thông tin trao đổi giữa các kênh UART, đồng thời hiển thị các thông số khi người dùng tiến hành thiết lập baud rate cho các kênh UART
 
 **2. Phần mềm**
-- Hello world
--
+
+_Ứng dụng trên ESP32 thực hiện các chức năng bao gồm_
+
+- Bắt và xử lý các bản tin nhận được từ 2 kênh UART ngoại vi, cho hiển thị ra màn hình OLED để tiện theo dõi
+- Chuyển tiếp các bản tin nhận được từ UART_A sang UART_B và ngược lại
+- Xử lý tín hiệu ngắt từ nút bấm ứng với các chức năng như chọn kênh UART để thao tác, tăng/giảm baud rate.
+- Lưu dữ liệu baud rate của từng kênh truyền _(nếu có thay đổi)_ vào trong bộ nhớ flash (EEPROM) của ESP32.
+  - Việc lưu trữ được diễn ra tự động sau một khoảng thời gian nhất định kể từ lần cuối người dùng thao tác với hệ thống _(sử dụng Timer để định thời gian)_
+  - Dữ liệu trong EEPROM sẽ được trích xuất và cài làm mặc định cho các kênh UART mỗi khi thiết bị khởi động lại
 
 ### ĐẶC TẢ HÀM
 
