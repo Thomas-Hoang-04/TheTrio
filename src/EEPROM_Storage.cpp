@@ -26,7 +26,7 @@ void initializeEEPROM() {
     Serial.println("EEPROM initialized with default baud rates (9600)");
 }
 
-void saveBaudRatesOptimized(int baudIndex1, int baudIndex2) {
+void saveBaudRates(int baudIndex1, int baudIndex2) {
     // Read current values
     int currentIndex1 = EEPROM.readInt(EEPROM_BAUD1_ADDR);
     int currentIndex2 = EEPROM.readInt(EEPROM_BAUD2_ADDR);

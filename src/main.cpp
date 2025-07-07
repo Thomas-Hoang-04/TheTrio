@@ -86,7 +86,7 @@ void processButtonAction() {
 // eck and save baud rates after timeout
 void checkAndSaveBaudRates() {
   // Use optimized single-commit save function
-  saveBaudRatesOptimized(baudIndex1, baudIndex2);
+  saveBaudRates(baudIndex1, baudIndex2);
 
   // Update UART configurations if they changed
   if (originalBaudIndex1 != baudIndex1) {
@@ -99,6 +99,25 @@ void checkAndSaveBaudRates() {
     Seria2.begin(baud_list[baudIndex2], SERIAL_8N1, 5, 4);
     Serial.print("Cập nhật baud rate cho UART_B: ");
     Serial.println(baud_list[baudIndex2]);
+  }
+}
+
+void handleUARTCommunication() {
+  String received;
+  if (Seria1.available()) {
+    received = Seria1.readStringUntil('\n');
+    Serial.print("Từ UART1: ");
+    Serial.println(received);
+    Seria2.println(received);
+    msg_A = received;
+  }
+
+  if (Seria2.available()) {
+    received = Seria2.readStringUntil('\n');
+    Serial.print("Từ UART2: ");
+    Serial.println(received);
+    Seria1.println(received);
+    msg_B = received;
   }
 }
 
@@ -162,21 +181,7 @@ void loop() {
     menu_msg(msg_A, msg_B);
   }
 
-  if (Seria1.available()) {
-    String received = Seria1.readStringUntil('\n');
-    Serial.print("Từ UART1: ");
-    Serial.println(received);
-    Seria2.println(received);
-    msg_A = received;
-  }
-
-  if (Seria2.available()) {
-    String received = Seria2.readStringUntil('\n');
-    Serial.print("Từ UART2: ");
-    Serial.println(received);
-    Seria1.println(received);
-    msg_B = received;
-  }
+  handleUARTCommunication();
 
   if (inInterruptMode) {
     Serial.print("Đang chọn baudrate cho UART");

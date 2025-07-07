@@ -1,6 +1,6 @@
 # Thiết bị giám sát và can thiệp đường truyền UART
 
-Mô tả
+_**Ae viết hộ đoạn này phát. Chỗ này đg kbt viết cái gì**_
 
 ## GIỚI THIỆU
 
@@ -58,20 +58,96 @@ _Ứng dụng trên ESP32 thực hiện các chức năng bao gồm_
 - Chuyển tiếp các bản tin nhận được từ UART_A sang UART_B và ngược lại
 - Xử lý tín hiệu ngắt từ nút bấm ứng với các chức năng như chọn kênh UART để thao tác, tăng/giảm baud rate.
 - Lưu dữ liệu baud rate của từng kênh truyền _(nếu có thay đổi)_ vào trong bộ nhớ flash (EEPROM) của ESP32.
-  - Việc lưu trữ được diễn ra tự động sau một khoảng thời gian nhất định kể từ lần cuối người dùng thao tác với hệ thống _(sử dụng Timer để định thời gian)_
+  - Việc lưu trữ được diễn ra tự động sau một khoảng thời gian nhất định kể từ lần cuối người dùng thao tác với hệ thống _(sử dụng Hardware Timer để định thời gian chính xác)_
   - Dữ liệu trong EEPROM sẽ được trích xuất và cài làm mặc định cho các kênh UART mỗi khi thiết bị khởi động lại
 
 ### ĐẶC TẢ HÀM
 
-- Giải thích một số hàm quan trọng: ý nghĩa của hàm, tham số vào, ra
+- Hàm xử lý giao diện trên màn hình OLED
 
   ```C
-     /**
-      *  Hàm tính ...
-      *  @param  x  Tham số
-      *  @param  y  Tham số
-      */
-     void abc(int x, int y = 2);
+  /**
+   * @brief Hàm hiển thị menu thiết lập baud rate cho kênh UART
+   *
+   * @param baud_rate: baud rate được chọn
+   * @param uart_channel: tên kênh UART
+   */
+  void menu_UART(int baud_rate, String uart_channel);
+
+  /**
+   * @brief Hàm tạo giao diện hiển thị thông tin trao đổi giữa 2 kênh UART
+   *
+   * @param msg_A: thông tin gửi từ UART_A
+   * @param msg_B: thông tin gửi từ UART_B
+   */
+  void menu_msg(String msg_A, String msg_B);
+  ```
+
+- Hàm xử lý bộ nhớ flash
+
+  ```C
+  /**
+   * @brief Hàm thực hiện lưu trữ cấu hình baud rate của các kênh UART vào bộ nhớ flash
+   *
+   * @param baudIndex1: chỉ số của baud rate được chọn cho kênh UART_A
+   * @param baudIndex2: chỉ số của baud rate được chọn cho kênh UART_B
+   *
+   * @note Hàm sẽ chỉ thực hiện nếu phát hiện thay đổi về cấu hình baud rate của các kênh UART
+   * @note Các chỉ số ứng với vị trí của baud rate trong mảng được khai báo tại file main.cpp
+   */
+  void saveBaudRates(int baudIndex1, int baudIndex2);
+
+  /**
+   * @brief Hàm thực hiện đọc cấu hình baud rate của các kênh UART từ bộ nhớ flash
+   *
+   * @param baudIndex1: con trỏ lưu chỉ số của baud rate được chọn cho kênh UART_A
+   * @param baudIndex2: con trỏ lưu chỉ số của baud rate được chọn cho kênh UART_B
+   *
+   * @note Các chỉ số ứng với vị trí của baud rate trong mảng được khai báo tại file main.cpp
+   */
+  void loadBaudRates(int* baudIndex1, int* baudIndex2);
+
+  /**
+   * @brief Hàm thực hiện kiểm tra và lưu trữ cấu hình baud rate của các kênh UART
+   *
+   * Hàm được khai báo trong file main.cpp, gọi tới hàm saveBaudRates() để thực hiện lưu trữ cấu hình baud rate của các kênh UART và in log ra Serial
+   */
+  void checkAndSaveBaudRates();
+  ```
+
+- Hàm xử lý tín hiệu từ nút bấm
+
+  ```C
+  /**
+   * @brief Hàm xử lý tín hiệu từ nút bấm
+   *
+   * Hàm sẽ xử lý các cờ tín hiệu thiết lập bởi ngắt để thực hiện các chức năng như chọn kênh UART để thao tác, tăng/giảm baud rate.
+   * Hàm được thiết kế thực hiện trong main loop để giảm tải cho ISR
+   */
+  void processButtonAction();
+
+  /**
+   * @brief Hàm xử lý ngắt từ nút bấm
+   *
+   * Hàm sẽ kích hoạt khi có tín hiệu ngắt từ nút bấm, thiết lập các cờ tương ứng để hàm xử lý trong main loop thực hiện các chức năng tương ứng.
+   *
+   * Hàm cũng sẽ kích hoạt timer để tự động phát tín hiệu thực hiện lưu trữ cấu hình baud rate của các kênh UART (nếu có thay đổi) sau 3s kể từ lần cuối người dùng thao tác với hệ thống
+   *
+   * Hàm được đặt trong IRAM để đảm bảo tốc độ cho ISR
+   */
+  void IRAM_ATTR handleButtonInterrupt();
+  ```
+
+- Hàm xử lý thông tin trao đổi giữa 2 kênh UART
+
+  ```C
+  /**
+   * @brief Hàm xử lý thông tin trao đổi giữa 2 kênh UART
+   *
+   * Hàm sẽ tiếp nhận thông tin từ 2 kênh UART và thực hiện chuyển tiếp
+   * Hàm sẽ lưu thông tin nhận được từ 2 kênh UART vào biến msg_A và msg_B để hiển thị trên màn hình OLED
+   */
+  void handleUARTCommunication();
   ```
 
 ### KẾT QUẢ

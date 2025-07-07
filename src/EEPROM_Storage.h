@@ -12,7 +12,7 @@
 
 // Function declarations
 void setupEEPROM();
-void saveBaudRatesOptimized(int baudIndex1, int baudIndex2);
+void saveBaudRates(int baudIndex1, int baudIndex2);
 void loadBaudRates(int* baudIndex1, int* baudIndex2);
 bool isEEPROMInitialized();
 void initializeEEPROM();

@@ -15,7 +15,7 @@
 extern Adafruit_SSD1306 display;
 
 void setup_OLED();
-void menu_UART(int selected, String uart_channel);
+void menu_UART(int baud_rate, String uart_channel);
 void menu_msg(String msg_A, String msg_B);
 
 #endif
