@@ -1,24 +1,31 @@
 #include <Arduino.h>
 #include <HardwareSerial.h>
-#include <OLED.h>
-#include "EEPROM_Storage.h"
+#include <display/OLED.h>
+#include <config/BaudConfig.h>
+#include <storage/EEPROM_Storage.h>
 
 // Tạo 2 UART riêng
 HardwareSerial Seria1(1);
 HardwareSerial Seria2(2);
 
-// Button pin definitions
+// UART pins
+#define UART1_RX_PIN 16
+#define UART1_TX_PIN 17
+#define UART2_RX_PIN 5
+#define UART2_TX_PIN 4
+
+// Button pins
 #define INC_BUTTON 26
 #define DEC_BUTTON 27
 #define SLCT_BUTTON 25
 
-const int baud_list[] = {600,750,1200,2400,4800,9600,19200,31250,38400,57600,74880,115200,230400};
-const int baud_count = sizeof(baud_list) / sizeof(baud_list[0]);
-
 int baudIndex1 = 0;
 int baudIndex2 = 0;
 bool isBaud1 = true;
-String msg_A, msg_B;
+int baudrateA, baudrateB;
+
+String msg_A = "Hello from UART A";
+String msg_B = " ";
 
 volatile bool inInterruptMode = false;
 volatile bool buttonPressed = false;
@@ -29,10 +36,15 @@ int originalBaudIndex1 = 0;
 int originalBaudIndex2 = 0;
 bool wasInInterruptMode = false;
 
-hw_timer_t * timer = NULL;
+unsigned long lastDebounceTime = 0;
+
+hw_timer_t* timer = NULL;
 
 // Minimal ISR handler - just set flags and record button type
 void IRAM_ATTR handleButtonInterrupt() {
+  if (millis() - lastDebounceTime < 50) return;
+  lastDebounceTime = millis();
+
   if (!inInterruptMode) {
     inInterruptMode = true;
     // Store original values when entering interrupt mode
@@ -83,7 +95,7 @@ void processButtonAction() {
   buttonType = 0;
 }
 
-// eck and save baud rates after timeout
+// Check and save baud rates after timeout
 void checkAndSaveBaudRates() {
   // Use optimized single-commit save function
   saveBaudRates(baudIndex1, baudIndex2);
@@ -100,6 +112,9 @@ void checkAndSaveBaudRates() {
     Serial.print("Cập nhật baud rate cho UART_B: ");
     Serial.println(baud_list[baudIndex2]);
   }
+
+  baudrateA = baud_list[baudIndex1];
+  baudrateB = baud_list[baudIndex2];
 }
 
 void handleUARTCommunication() {
@@ -140,8 +155,11 @@ void setup() {
   originalBaudIndex2 = baudIndex2;
 
   // Initialize UART with loaded baud rates
-  Seria1.begin(baud_list[baudIndex1], SERIAL_8N1, 16, 17);
-  Seria2.begin(baud_list[baudIndex2], SERIAL_8N1, 5, 4);
+  Seria1.begin(baud_list[baudIndex1], SERIAL_8N1, UART1_RX_PIN, UART1_TX_PIN);
+  Seria2.begin(baud_list[baudIndex2], SERIAL_8N1, UART2_RX_PIN, UART2_TX_PIN);
+
+  baudrateA = baud_list[baudIndex1];
+  baudrateB = baud_list[baudIndex2];
 
   Serial.println("ESP32 UART Bridge ready!");
   Serial.print("UART1 baud rate: ");
@@ -177,10 +195,6 @@ void loop() {
   // Update interrupt mode state
   wasInInterruptMode = inInterruptMode;
 
-  if (!inInterruptMode) {
-    menu_msg(msg_A, msg_B);
-  }
-
   handleUARTCommunication();
 
   if (inInterruptMode) {
@@ -196,5 +210,7 @@ void loop() {
     }
 
     delay(500);
+  } else {
+      menu_msg(msg_A, msg_B, baudrateA, baudrateB);
   }
 }
