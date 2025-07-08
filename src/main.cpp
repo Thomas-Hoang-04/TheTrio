@@ -117,7 +117,7 @@ void checkAndSaveBaudRates() {
   baudrateB = baud_list[baudIndex2];
 }
 
-void handleUARTCommunication() {
+inline void handleUARTCommunication() {
   String received;
   if (Seria1.available()) {
     received = Seria1.readStringUntil('\n');
