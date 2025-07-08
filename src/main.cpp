@@ -24,8 +24,8 @@ int baudIndex2 = 0;
 bool isBaud1 = true;
 int baudrateA, baudrateB;
 
-String msg_A = "Hello from UART A";
-String msg_B = " ";
+String msg_A = "";
+String msg_B = "";
 
 volatile bool inInterruptMode = false;
 volatile bool buttonPressed = false;
