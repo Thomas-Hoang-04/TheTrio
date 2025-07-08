@@ -15,7 +15,7 @@ _**Ae viết hộ đoạn này phát. Chỗ này đg kbt viết cái gì**_
 
 **Ảnh chụp minh họa:**
 
-  ![Ảnh minh họa]()
+  ![Ảnh minh họa](./images/Circuit%20Demo.jpg)
 
 ## TÁC GIẢ
 
@@ -39,7 +39,7 @@ _**Linh kiện sử dụng**_
 
 ## SƠ ĐỒ SCHEMATIC
 
-![UART Interceptor Schematic](./UART%20Schematic.png)
+![UART Interceptor Schematic](./images/UART%20Schematic.png)
 
 ### TÍCH HỢP HỆ THỐNG
 
