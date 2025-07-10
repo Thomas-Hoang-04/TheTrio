@@ -33,31 +33,24 @@ void menu_UART(int baud_rate, String uart_channel) {
 
 void menu_msg(String msg_A, String msg_B, int baud_rate_A, int baud_rate_B) {
     display.clearDisplay();
-    display.setCursor(0, 0);
-    display.println("UART Monitoring");
 
-    display.setCursor(0, 12);
+
+    display.setCursor(0, 0);
     display.print("A:");
     display.print(baud_rate_A);
 
-    display.setCursor(64, 12);
+    display.setCursor(64, 0);
     display.print("B:");
     display.print(baud_rate_B);
 
-    display.setCursor(0, 24);
+    display.setCursor(0, 12);
     display.print("A:");
-    display.println(truncateMessage(msg_A, MESSAGE_DISPLAY_LENGTH));
+    display.println(msg_A);
     
     display.setCursor(0, 36);
     display.print("B:");
-    display.println(truncateMessage(msg_B, MESSAGE_DISPLAY_LENGTH));
+    display.println(msg_B);
 
     display.display();
 }
 
-String truncateMessage(String message, int maxLength) {
-    if (message.length() <= maxLength) {
-        return message;
-    }
-    return message.substring(0, maxLength - 3) + "...";
-}
