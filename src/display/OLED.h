@@ -6,6 +6,9 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
+#define MAX_MESSAGE_LENGTH 64
+#define MESSAGE_DISPLAY_LENGTH 20
+
 #define WIDTH 128
 #define HEIGHT 64
 #define OLED_RESET -1
@@ -16,6 +19,7 @@ extern Adafruit_SSD1306 display;
 
 void setup_OLED();
 void menu_UART(int baud_rate, String uart_channel);
-void menu_msg(String msg_A, String msg_B);
+void menu_msg(String msg_A, String msg_B, int baud_rate_A, int baud_rate_B);
+String truncateMessage(String message, int maxLength);
 
 #endif

@@ -17,7 +17,7 @@ _Báo cáo dưới đây tập trung vào việc mô tả chi tiết phần cứ
 
 **Ảnh chụp minh họa:**
 
-  ![Ảnh minh họa]()
+  ![Ảnh minh họa](./images/Circuit%20Demo.jpg)
 
 ## TÁC GIẢ
 
@@ -41,7 +41,7 @@ _**Linh kiện sử dụng**_
 
 ## SƠ ĐỒ SCHEMATIC
 
-![UART Interceptor Schematic](./UART%20Schematic.png)
+![UART Interceptor Schematic](./images/UART%20Schematic.png)
 
 ### TÍCH HỢP HỆ THỐNG
 
