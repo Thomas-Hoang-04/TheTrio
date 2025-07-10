@@ -1,7 +1,8 @@
 # Thiết bị giám sát và can thiệp đường truyền UART
 
-_Từ ESP32 tạo ra thiết bị có khả năng giám sát và can thiệp đường truyền UART. Có thể sử dụng trong thực tế cho các trường hợp: giải mã giao thức của các thiết bị điện tử đóng (ti vi, máy giặt); chẩn đoán và sửa lỗi sai của thiết bị điện tử, tạo ra hệ thống giám sát capture và debug realtime._
-_Báo cáo dưới đây tập trung vào việc mô tả chi tiết phần cứng và phần mềm của sản phẩm, tính năng của sản phẩm và kết quả đạt được._
+-Từ ESP32 tạo ra thiết bị có khả năng giám sát và can thiệp đường truyền UART. Có thể sử dụng trong thực tế cho các trường hợp: giải mã giao thức của các thiết bị điện tử đóng (ti vi, máy giặt); chẩn đoán và sửa lỗi sai của thiết bị điện tử, tạo ra hệ thống giám sát capture và debug realtime.
+
+-Báo cáo dưới đây tập trung vào việc mô tả chi tiết phần cứng và phần mềm của sản phẩm, tính năng của sản phẩm và kết quả đạt được.
 
 ## GIỚI THIỆU
 
