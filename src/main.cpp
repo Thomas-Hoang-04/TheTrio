@@ -18,6 +18,7 @@ HardwareSerial Seria2(2);
 #define INC_BUTTON 26
 #define DEC_BUTTON 27
 #define SLCT_BUTTON 25
+#define LOCK_BUTTON 18
 
 int baudIndex1 = 0;
 int baudIndex2 = 0;
@@ -61,6 +62,8 @@ void IRAM_ATTR handleButtonInterrupt() {
   }
   else if (digitalRead(SLCT_BUTTON) == HIGH) {
     buttonType = 3;
+  } else if (digitalRead(LOCK_BUTTON) == HIGH) {
+    buttonType = 4;
   }
 
   // Reset timer on any button press
@@ -89,6 +92,11 @@ void processButtonAction() {
       Serial.print(isBaud1 ? "1: " : "2: ");
       Serial.println(baud_list[*baudIndex]);
       isBaud1 = !isBaud1;
+      break;
+      
+    case 4:
+      inInterruptMode = false;
+      timerAlarmDisable(timer);
       break;
   }
 
@@ -170,10 +178,13 @@ void setup() {
   pinMode(SLCT_BUTTON, INPUT);
   pinMode(INC_BUTTON, INPUT);
   pinMode(DEC_BUTTON, INPUT);
+  pinMode(LOCK_BUTTON, INPUT);
 
   attachInterrupt(digitalPinToInterrupt(SLCT_BUTTON), handleButtonInterrupt, RISING);
   attachInterrupt(digitalPinToInterrupt(INC_BUTTON), handleButtonInterrupt, RISING);
   attachInterrupt(digitalPinToInterrupt(DEC_BUTTON), handleButtonInterrupt, RISING);
+  attachInterrupt(digitalPinToInterrupt(LOCK_BUTTON), handleButtonInterrupt, RISING);
+
 
   // Timer setup: 3 second timeout
   timer = timerBegin(0, 8000, true);
